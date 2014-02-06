@@ -1,0 +1,96 @@
+{% load staticfiles %}
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <meta name="author" content="Justin Svegliato" />
+        <title>OmniTech DCPC Simulation</title>
+
+        <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+        <link href="{% static 'css/non-responsive.css' %}" rel="stylesheet">
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="../../assets/js/html5shiv.js"></script>
+          <script src="../../assets/js/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <div id="navigation" class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <span class="navbar-brand">OmniTech DCPC Simulation</span>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <div id="controls" class="pull-right">
+                        <button id="reset" class="btn btn-danger"><span class="glyphicon glyphicon-refresh"></span></button>        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content" class="container">
+            <div class="row"> 
+                <div class="col-xs-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><h3 class="panel-title">Control</h3></div>
+                        <div class="panel-body">
+                            <div class="col-xs-10">{{ add_engine_form.type }}</div>                   
+                            <button id="add" class="btn btn-info col-xs-2"><span id="add-icon" class='glyphicon glyphicon-plus'></span></button>
+                        </div>
+                    </div> 
+                </div>   
+                
+                <div id="current-demand" class="col-xs-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><h3 class="panel-title">Current Demand</h3></div>
+                        <div class="panel-body text-center">
+                            <h3 class="lead"><span id="demand">0</span> Kilowatts</h3>
+                        </div>
+                    </div> 
+                </div>              
+
+                <div class="col-xs-5">
+                    <div class="panel panel-default">
+                       <div class="panel-heading"><h3 class="panel-title">Demand Range (Kilowatts)</h3></div>
+                       <div class="panel-body">
+                            <div class="col-xs-5">
+                               <input type="text" class="form-control" id="low-input" placeholder="Minimum">
+                            </div>
+                    
+                            <div class="col-xs-5">
+                                <input type="text" class="form-control" id="high-input" placeholder="Maximum">
+                            </div>
+                    
+                            <button id="start-stop" type="submit" class="btn btn-success col-xs-2 pull-right"><span id="start-stop-icon" class='glyphicon glyphicon-play'></span></button>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+            
+            <div class="row">
+                <div id="satisified-demand-bar" class="progress"></div>
+            </div>
+            
+            <div class="row">
+                <div id="engine-container"></div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+        var engineTypes = {{ engine_types }};
+        </script>
+
+        <script src="{% static 'js/jquery.js' %}"></script>
+        <script src="{% static 'js/jquery-validate.js' %}"></script>
+        <script src="{% static 'js/jquery-validate-extras.js' %}"></script>
+        <script src="{% static 'js/bootstrap.js' %}"></script>   
+        <script src="{% static 'js/utils.js' %}"></script>
+        <script src="{% static 'js/engine-manager.js' %}"></script>
+        <script src="{% static 'js/control.js' %}"></script>
+
+    </body>
+</html>
