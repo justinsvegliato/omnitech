@@ -69,13 +69,10 @@
                         </div>
                     </div> 
                 </div>
-            </div>
+            </div>        
             
             <div class="row">
-                <div id="satisified-demand-bar" class="progress"></div>
-            </div>
-            
-            <div class="row">
+                <canvas id="chart" width="970" height="130"></canvas>
                 <div id="engine-container"></div>
             </div>
         </div>
@@ -87,10 +84,10 @@
         <script src="{% static 'js/jquery.js' %}"></script>
         <script src="{% static 'js/jquery-validate.js' %}"></script>
         <script src="{% static 'js/jquery-validate-extras.js' %}"></script>
+        <script src="{% static 'js/smoothie.js' %}"></script>
         <script src="{% static 'js/bootstrap.js' %}"></script>   
         <script src="{% static 'js/utils.js' %}"></script>
         <script src="{% static 'js/engine-manager.js' %}"></script>
         <script src="{% static 'js/control.js' %}"></script>
-
     </body>
 </html>

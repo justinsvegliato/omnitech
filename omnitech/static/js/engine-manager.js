@@ -3,22 +3,31 @@ function EngineManager() {};
 EngineManager.engines = [];
 
 EngineManager.balance = function(demand) {
+    Control.series.append(new Date().getTime(), demand);
     $.ajax({
         type: 'get',
         async: false,
         url: "/engine_manager/balance/" + JSON.stringify(EngineManager.engines) + "/" + Control.demand + "/", 
         success: function(data) {
             Control.demandDisplay.html(Control.demand + "");
-            Control.satisfiedDemandBar.empty();
             
             var engines = $.parseJSON(data);
             var progressBarTypes = ["success", "info", "warning", "danger"];
             $(".engine-status.progress-bar-success").each(function(index, object) {
                 var percentageContributed = ((engines[index]._energyOutput / Control.demand) * 100) + "%";
                 $(object).css("width", percentageContributed);
+                
+                var rpm = parseFloat(Math.round(engines[index]._rpm * 100) / 100).toFixed(0);
+                var energyOutput = parseFloat(Math.round(engines[index]._energyOutput * 100) / 100).toFixed(0);
 
-                var engineContribution = Control.demandContributionTemplate.format(progressBarTypes[index % 4], percentageContributed);
-                Control.satisfiedDemandBar.append(engineContribution);
+                var dataContent = $("<div></div").html($.parseHTML($(object).parent().attr("data-content")));
+                dataContent.find(".rpm-variable").html(rpm);
+                dataContent.find(".energy-output-variable").html(energyOutput);
+                $(object).parent().attr('data-content', dataContent.html());
+
+                var popover = $(object).parent().siblings(".popover");
+                popover.find(".rpm-variable").html(rpm);
+                popover.find(".energy-output-variable").html(energyOutput);
             });
         }
     });

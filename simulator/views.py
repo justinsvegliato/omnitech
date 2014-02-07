@@ -39,12 +39,14 @@ def balance(request, engines, demand):
     minimum_rpm_constraint = ((rpms - minimum_rpms) >= 0)
 
     constraints = [demand_constraint, maximum_rpm_constraint, minimum_rpm_constraint]                
-    objective_function = op((dot(linear_engine_costs, rpms) - sum(fixed_engine_costs)), constraints)        
+    objective_function = op((dot(linear_engine_costs, rpms) + sum(fixed_engine_costs)), constraints)        
                       
     objective_function.solve()       
-    
+
     for engine, rpm in zip(active_engines, rpms.value):
         engine["_rpm"] = rpm
-        engine["_energyOutput"] = float(EngineType.objects.get(pk=engine["_engineTypeId"]).fixed_energy_output) * rpm + float(EngineType.objects.get(pk=engine["_engineTypeId"]).fixed_energy_output)
+        energy_output_per_rpm = float(EngineType.objects.get(pk=engine["_engineTypeId"]).fixed_energy_output)
+        base_energy_output = float(EngineType.objects.get(pk=engine["_engineTypeId"]).fixed_energy_output)
+        engine["_energyOutput"] = energy_output_per_rpm * rpm + base_energy_output                   
     
     return HttpResponse(json.dumps(active_engines));

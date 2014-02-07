@@ -11,20 +11,29 @@ Control.highInput = $("#high-input");
 Control.startStopIcon = $("#start-stop-icon");
 Control.engineContainer = $("#engine-container");
 Control.toggleButton = $(".toggle");
-Control.satisfiedDemandBar = $("#satisified-demand-bar");
 Control.demandDisplay = $("#demand");
+Control.progressBar = $(".progress-bar");
 Control.resetButton = $("#reset");
-Control.interval = 2000;
+Control.interval = 250;
 
 Control.engineCounter = 0;
 Control.processId = -1;
 Control.demand = 0;
 Control.isReady = true;
+Control.series = new TimeSeries();
 
 Control.engineTemplate = "<div id='{0}' class='row engine-row engine-type-{1}'> \
                               <div class='col-xs-11'> \
                                   <span class='engine-type-label'>{2}</span> \
-                                  <div class='progress progress-striped active'> \
+                                  <div class='progress progress-striped active' data-title='Engine Details' data-toggle='popover' \
+                                       data-content='<div class=\"row\"><div class=\"col-xs-7\">RPM</div><div class=\"col-xs-5 rpm-variable\">{3}</div> \
+                                                     <div class=\"col-xs-7\">Energy Output</div><div class=\"col-xs-5 energy-output-variable\">{4}</div> \
+                                                     <div class=\"col-xs-7\">Fixed Cost</div><div class=\"col-xs-5\">{5}</div> \
+                                                     <div class=\"col-xs-7\">Linear Cost</div><div class=\"col-xs-5\">{6}</div> \
+                                                     <div class=\"col-xs-7\">Fixed Output</div><div class=\"col-xs-5\">{7}</div> \
+                                                     <div class=\"col-xs-7\">Linear Output</div><div class=\"col-xs-5\">{8}</div> \
+                                                     <div class=\"col-xs-7\">Minimum RPM</div><div class=\"col-xs-5\">{9}</div> \
+                                                     <div class=\"col-xs-7\">Maximum RPM</div><div class=\"col-xs-5\">{10}</div></div>'> \
                                      <div class='engine-status progress-bar progress-bar-success' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='width: 0%'></div> \
                                   </div> \
                               </div> \
@@ -84,7 +93,6 @@ Control.enableEngine = function(id, toggleButton) {
     var engineProgressDiv = $("#" + id + " .progress");
     var engineProgressBar = $("#" + id + " .progress .progress-bar");
     $(toggleButton).addClass("btn-warning").removeClass("btn-success");
-    engineProgressDiv.addClass("active").addClass("progress-striped");
     engineProgressBar.removeClass("progress-bar-warning").addClass("progress-bar-success").addClass("active");
     
     EngineManager.enableEngine(id);
@@ -96,7 +104,6 @@ Control.disableEngine = function(id, toggleButton) {
     var engineProgressDiv = $("#" + id + " .progress");
     var engineProgressBar = $("#" + id + " .progress .progress-bar");
     $(toggleButton).removeClass("btn-warning").addClass("btn-success");
-    engineProgressDiv.removeClass("active").removeClass("progress-striped");
     engineProgressBar.removeClass("progress-bar-success").addClass("progress-bar-warning").css("width", "0%");
     
     EngineManager.disableEngine(id);
@@ -110,8 +117,27 @@ Control.addEngine = function() {
     var engineType = $.grep(engineTypes, function(n) {
         return n.pk === parseInt(engineTypeId);
     });
-    Control.engineContainer.append(Control.engineTemplate.format(id, engineTypeId, engineType[0].fields.type));
+    Control.engineContainer.append(Control.engineTemplate.format(
+        id, 
+        engineTypeId, 
+        engineType[0].fields.type, 
+        0, 
+        0,
+        engineType[0].fields.fixed_engine_cost,
+        engineType[0].fields.linear_engine_cost,
+        engineType[0].fields.fixed_energy_output,
+        engineType[0].fields.linear_energy_output,
+        engineType[0].fields.minimum_rpm,
+        engineType[0].fields.maximum_rpm
+    ));
     $("#" + id).hide().fadeIn();
+
+    $("#" + id).find(".progress").popover({
+        html: true,
+        trigger: "hover",
+        placement: "top",
+        animation: false
+    });
     
     EngineManager.addEngine(id, 0, 0, engineTypeId, true);
     Control.isReady = true;
@@ -134,7 +160,6 @@ Control.reset = function() {
     Control.isReady = false;
     Control.content.hide().fadeIn("slow");
     Control.engineCounter = 0;
-    Control.satisfiedDemandBar.empty();
     Control.engineContainer.empty();
     Control.typeInput.val("");
     Control.lowInput.val("");
@@ -180,4 +205,81 @@ $(document).ready(function() {
     Control.resetButton.on("click", function() {
         Control.reset();
     });
+
+    $(".progress-bar").live("mouseover", function() {
+        var parent = $(this).parent(".progress");
+        parent.css("background-color", "#dbdbdb");
+        parent.css("cursor", "pointer");
+
+        $(this).css("background-color", "#afafaf");
+        $(this).css("cursor", "pointer");
+    }).live('mouseout', function() {
+        var parent = $(this).parent(".progress");
+        parent.css("background-color", "");
+        parent.css("cursor", "");
+
+        $(this).css("background-color", "");
+        $(this).css("cursor", "");
+    });
+
+    $(".progress").live("mouseover", function() {
+        var child = $(this).children(".progress-bar");
+        child.css("background-color", "#afafaf");
+        child.css("cursor", "pointer");
+        
+        $(this).css("background-color", "#dbdbdb");
+        $(this).css("cursor", "pointer");
+    }).live('mouseout', function() {
+        var child = $(this).children(".progress-bar");
+        child.css("background-color", "");
+        child.css("cursor", "");
+
+        $(this).css("background-color", "");
+        $(this).css("cursor", "");
+    });
+
+    $(".engine-type-label").live("mouseover", function() {
+        var parent = $(this).siblings(".progress");
+        parent.css("background-color", "#dbdbdb");
+        parent.css("cursor", "pointer");
+
+        var child = parent.children(".progress-bar");
+        child.css("background-color", "#afafaf");
+        child.css("cursor", "pointer");
+    }).live('mouseout', function() {
+        var parent = $(this).siblings(".progress");
+        parent.css("background-color", "");
+        parent.css("cursor", "");
+
+        var child = parent.children(".progress-bar");
+        child.css("background-color", "");
+        child.css("cursor", "");
+    });
+
+    var chart = new SmoothieChart({
+        millisPerPixel: 30,
+        maxValueScale: 1.2,
+        grid: {
+            fillStyle: 'transparent',
+            strokeStyle: 'rgba(119,119,119,0.45)',
+            millisPerLine: 6000,
+            verticalSections: 0
+        },
+        labels: {
+            fillStyle: '#424242',
+            fontSize: 14,
+            precision: 0
+        },
+        minValue: 0
+    });
+
+    var canvas = document.getElementById('chart');
+
+    chart.addTimeSeries(Control.series, {
+        lineWidth: 1.9,
+        strokeStyle: '#c0c0c0',
+        fillStyle: 'rgba(0,0,0,0.11)'
+    });
+
+    chart.streamTo(canvas, 0);
 });
