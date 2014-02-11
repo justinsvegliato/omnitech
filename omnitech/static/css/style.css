@@ -29,3 +29,16 @@
 .engine-row-controls {
     margin-top: 20px;
 }
+
+.navbar-brand {
+    font-size: 22px;
+}
+
+.nav-tabs {
+    border-bottom: none;
+}
+
+.alert {
+    margin-bottom: 0px;
+    margin-top: 12px;
+}

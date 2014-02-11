@@ -6,6 +6,7 @@ class EngineType(models.Model):
     linear_engine_cost = models.DecimalField(max_digits=19, decimal_places=10)
     fixed_energy_output = models.DecimalField(max_digits=19, decimal_places=10)
     linear_energy_output = models.DecimalField(max_digits=19, decimal_places=10)
+    financial_cost = models.DecimalField(max_digits=19, decimal_places=10)
     minimum_rpm = models.IntegerField()
     maximum_rpm = models.IntegerField()
     

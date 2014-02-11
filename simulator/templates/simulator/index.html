@@ -5,7 +5,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <meta name="author" content="Justin Svegliato" />
-        <title>OmniTech DCPC Simulation</title>
+        <title>OmniTech</title>
 
         <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
         <link href="{% static 'css/non-responsive.css' %}" rel="stylesheet">
@@ -22,7 +22,7 @@
         <div id="navigation" class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
-                    <span class="navbar-brand">OmniTech DCPC Simulation</span>
+                    <span class="navbar-brand">Omni<span class="text-primary">Tech</span></span>
                 </div>
                 <div class="navbar-collapse collapse">
                     <div id="controls" class="pull-right">
@@ -72,7 +72,25 @@
             </div>        
             
             <div class="row">
-                <canvas id="chart" width="970" height="130"></canvas>
+                <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+                    <li class="active"><a id="demand-tab-button" href="#demand-tab" data-toggle="tab">Demand</a></li>
+                    <li><a id="cost-tab-button" href="#cost-tab" data-toggle="tab">Cost</a></li>
+                </ul>
+
+                <div id="my-tab-content" class="tab-content">
+                    <div class="tab-pane active" id="demand-tab">
+                        <canvas id="demand-chart" width="970" height="130"></canvas>
+                    </div>
+                    <div class="tab-pane" id="cost-tab">
+                        <canvas id="cost-chart" width="970" height="130"></canvas>
+                    </div>
+                </div>
+
+                <div class="alert alert-info alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    The bars below represents the percentage of each source's contribution to the energy demand. In the graph above, the <strong>thick light gray line</strong> represents the energy demand whereas the <strong>thin dark gray line</strong> represents the total energy produced by the sources.
+                </div>
+
                 <div id="engine-container"></div>
             </div>
         </div>
